@@ -15,9 +15,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
+    private static final Logger logger = LoggerFactory.getLogger(JwtFilter.class);
     private final JwtUtil jwtUtil;
     private final UserService userService;
 
@@ -38,12 +41,18 @@ public class JwtFilter extends OncePerRequestFilter {
         }
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             User user = userService.findByUsername(username);
-            if (jwtUtil.validateToken(token)) {
+            if (user != null && jwtUtil.validateToken(token)) {
+                String role = "ROLE_" + user.getRole().name();
+                logger.info("Setting authentication for user: {} with role: {}", username, role);
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                        user, null, java.util.Collections.singleton(() -> user.getRole().name()));
+                        user, null, java.util.Collections.singleton(() -> role));
                 auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(auth);
+            } else {
+                logger.warn("Invalid token or user not found for username: {}", username);
             }
+        } else if (username == null) {
+            logger.debug("No Authorization header found");
         }
         filterChain.doFilter(request, response);
     }

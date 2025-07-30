@@ -14,7 +14,7 @@ public class Schedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String tripPurpose;
 
     @ManyToOne
@@ -29,10 +29,10 @@ public class Schedule {
     @JoinColumn(name = "status_schedule", referencedColumnName = "id", nullable = false)
     private StatusSchedule statusSchedule;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String departurePoint;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String destination;
 
     @Column(nullable = false)

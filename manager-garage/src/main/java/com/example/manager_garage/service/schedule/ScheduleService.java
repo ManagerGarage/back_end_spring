@@ -18,8 +18,13 @@ import com.example.manager_garage.repository.StatusScheduleRepository;
 import com.example.manager_garage.repository.CarRepository;
 import com.example.manager_garage.repository.DriverRepository;
 import com.example.manager_garage.repository.VehicleLicenseMappingRepository;
+import com.example.manager_garage.entity.auth.User;
+import com.example.manager_garage.entity.auth.Role;
 import java.util.List;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import com.example.manager_garage.util.DateTimeUtil;
 
 @Service
 public class ScheduleService {
@@ -42,11 +47,29 @@ public class ScheduleService {
         return scheduleRepository.findAll();
     }
 
+    public List<Schedule> getSchedulesByUser(User user) {
+        if (user.getRole() == Role.DRIVER) {
+            // Nếu là DRIVER, chỉ lấy lịch trình của user này
+            Driver driver = driverRepository.findByUser(user)
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Không tìm thấy thông tin tài xế cho user: " + user.getUsername()));
+            return scheduleRepository.findByDriver(driver);
+        } else {
+            // Nếu là MANAGER hoặc COMMANDER, lấy tất cả lịch trình
+            return scheduleRepository.findAll();
+        }
+    }
+
     public Schedule createSchedule(CreateScheduleRequest request) {
         // Validate time constraints
         if (request.getEstimatedTimeEnd().isBefore(request.getStartTime()) ||
                 request.getEstimatedTimeEnd().isEqual(request.getStartTime())) {
             throw new IllegalArgumentException("Thời gian kết thúc phải sau thời gian bắt đầu");
+        }
+
+        // Kiểm tra thời gian không được trong quá khứ (theo múi giờ Việt Nam)
+        if (DateTimeUtil.isInPast(request.getStartTime())) {
+            throw new IllegalArgumentException("Thời gian bắt đầu không được trong quá khứ (múi giờ Việt Nam)");
         }
 
         // Validate car exists
@@ -99,7 +122,7 @@ public class ScheduleService {
         schedule.setDestination(request.getDestination());
         schedule.setStartTime(request.getStartTime());
         schedule.setEstimatedTimeEnd(request.getEstimatedTimeEnd());
-        schedule.setCreateDay(java.time.LocalDateTime.now());
+        schedule.setCreateDay(DateTimeUtil.getCurrentVietnamTime());
 
         return scheduleRepository.save(schedule);
     }

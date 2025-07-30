@@ -1,4 +1,4 @@
-package com.example.manager_garage.controller;
+package com.example.manager_garage.controller.driver;
 
 import com.example.manager_garage.entity.driver.Driver;
 import com.example.manager_garage.service.driver.DriverService;

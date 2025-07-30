@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import com.example.manager_garage.exception.ConflictException;
+import com.example.manager_garage.util.DateTimeUtil;
 
 @Service
 public class UserService {
@@ -46,7 +47,7 @@ public class UserService {
             role = "DRIVER";
         }
         user.setRole(Role.valueOf(role.toUpperCase()));
-        user.setCreateDay(java.time.LocalDateTime.now());
+        user.setCreateDay(DateTimeUtil.getCurrentVietnamTime());
         User savedUser = userRepository.save(user);
 
         // Nếu role là DRIVER thì tạo mới driver

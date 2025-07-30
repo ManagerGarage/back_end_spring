@@ -10,6 +10,8 @@ import com.example.manager_garage.dto.response.JwtResponse;
 import com.example.manager_garage.entity.driver.Driver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import com.example.manager_garage.exception.ResourceNotFoundException;
 
@@ -64,5 +66,13 @@ public class AuthController {
                 driver != null && driver.getLicense() != null ? driver.getLicense().getName() : null,
                 driver != null && driver.getStatusDriver() != null ? driver.getStatusDriver().getName() : null);
         return ResponseEntity.ok(new JwtResponse(token, userInfo));
+    }
+
+    @GetMapping("/test")
+    public ResponseEntity<?> testAuth() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+        return ResponseEntity
+                .ok("Authentication successful! User: " + user.getUsername() + ", Role: " + user.getRole());
     }
 }

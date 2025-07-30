@@ -26,4 +26,13 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
         // Tìm lịch trình theo trạng thái và thời gian kết thúc
         List<Schedule> findByStatusScheduleAndEstimatedTimeEndBefore(StatusSchedule statusSchedule,
                         LocalDateTime estimatedTimeEnd);
+
+        // Đếm số lịch trình theo trạng thái
+        long countByStatusSchedule(StatusSchedule statusSchedule);
+
+        // Tìm lịch trình theo trạng thái
+        List<Schedule> findByStatusSchedule(StatusSchedule statusSchedule);
+
+        // Tìm lịch trình theo tài xế
+        List<Schedule> findByDriver(Driver driver);
 }

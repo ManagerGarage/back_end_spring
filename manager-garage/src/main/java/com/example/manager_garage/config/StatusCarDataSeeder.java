@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import com.example.manager_garage.util.DateTimeUtil;
 
 @Component
 @RequiredArgsConstructor
@@ -21,7 +22,7 @@ public class StatusCarDataSeeder implements CommandLineRunner {
             if (statusCarRepository.findByName(name).isEmpty()) {
                 StatusCar statusCar = new StatusCar();
                 statusCar.setName(name);
-                statusCar.setCreateDay(LocalDateTime.now());
+                statusCar.setCreateDay(DateTimeUtil.getCurrentVietnamTime());
                 statusCarRepository.save(statusCar);
             }
         }

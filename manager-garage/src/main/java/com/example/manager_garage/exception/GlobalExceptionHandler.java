@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
+import com.example.manager_garage.util.DateTimeUtil;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,7 +16,7 @@ public class GlobalExceptionHandler {
 
     private ResponseEntity<Object> buildErrorResponse(Exception ex, HttpStatus status, WebRequest request) {
         Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
+        body.put("timestamp", DateTimeUtil.getCurrentVietnamTime());
         body.put("status", status.value());
         body.put("error", status.getReasonPhrase());
         body.put("message", ex.getMessage());
